@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.material)
     implementation("androidx.preference:preference:1.2.1")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
+    implementation("com.google.android.material:material:1.5.0-alpha04")
     implementation(libs.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
