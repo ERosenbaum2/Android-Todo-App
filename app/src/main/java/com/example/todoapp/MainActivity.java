@@ -1,12 +1,14 @@
 package com.example.todoapp;
 
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.widget.EditText;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,7 +35,12 @@ public class MainActivity extends AppCompatActivity {
         );
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setSupportActionBar(findViewById(R.id.toolbar));
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        Drawable overflow = toolbar.getOverflowIcon();
+        if (overflow != null) {
+            overflow.setTint(getResources().getColor(android.R.color.white, getTheme()));
+        }
         tasks = new ArrayList<>();
         adapter = new TaskAdapter(tasks);
         RecyclerView rv = findViewById(R.id.recycler_view);
