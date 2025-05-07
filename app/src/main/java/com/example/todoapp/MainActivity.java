@@ -20,7 +20,6 @@ import android.content.Intent;
 import android.view.MenuItem;
 import androidx.annotation.NonNull;
 
-
 public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Task> tasks;
