@@ -111,9 +111,8 @@ public class MainActivity extends AppCompatActivity {
             if (item.getItemId() == R.id.nav_settings) {
                 startActivity(new Intent(this, SettingsActivity.class));
             } else if (item.getItemId() == R.id.nav_about) {
-                new AlertDialog.Builder(this).setTitle("About")
-                        .setMessage("Simple To-Do App\nVersion 1.0")
-                        .setPositiveButton("OK", null).show();
+                Utils.showInfoDialog(this, "About", "Simple To-Do App\nVersion 1.0"
+                );
             }
             return true;
         });
