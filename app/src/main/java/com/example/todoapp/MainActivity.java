@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.EditText;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,8 +18,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,15 +33,31 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawer;
     private ActionBarDrawerToggle toggle;
 
+    private static final String KEY_SAVED_TASKS = "saved_tasks";
+    private static final String KEY_SAVED_DONE = "saved_done";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean nightMode = prefs.getBoolean("night_mode", false);
         AppCompatDelegate.setDefaultNightMode(nightMode ? AppCompatDelegate.MODE_NIGHT_YES
-                        : AppCompatDelegate.MODE_NIGHT_NO);
-
+                : AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (savedInstanceState != null && savedInstanceState.containsKey(KEY_SAVED_TASKS)) {
+            ArrayList<String> savedDescs = savedInstanceState.getStringArrayList(KEY_SAVED_TASKS);
+            boolean[] savedDones = savedInstanceState.getBooleanArray(KEY_SAVED_DONE);
+            tasks = new ArrayList<>();
+            for (int i = 0; i < savedDescs.size(); i++) {
+                Task t = new Task(savedDescs.get(i));
+                if (savedDones != null && i < savedDones.length) {
+                    t.setDone(savedDones[i]);
+                }
+                tasks.add(t);
+            }
+        } else {
+            tasks = new ArrayList<>();
+        }
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Drawable whiteOverflow = ContextCompat.getDrawable(this,
@@ -45,20 +65,20 @@ public class MainActivity extends AppCompatActivity {
         if (whiteOverflow != null) {
             toolbar.setOverflowIcon(whiteOverflow);
         }
-        tasks = new ArrayList<>();
         adapter = new TaskAdapter(tasks);
         RecyclerView rv = findViewById(R.id.recycler_view);
         rv.setLayoutManager(new LinearLayoutManager(this));
         rv.setAdapter(adapter);
         boolean autoSave = prefs.getBoolean("auto_save", false);
-        if (autoSave) {
+        if (savedInstanceState == null && autoSave) {
             loadTasksFromPreferences();
+            adapter.notifyDataSetChanged();
         }
         findViewById(R.id.fab).setOnClickListener(v -> {
             EditText input = new EditText(this);
             new AlertDialog.Builder(this).setTitle("Add Task")
                     .setMessage("Enter task description:").setView(input)
-                    .setPositiveButton("Add", (dialog, which) -> {
+                    .setPositiveButton("Add", (dlg, which) -> {
                         String desc = input.getText().toString().trim();
                         if (!desc.isEmpty()) {
                             tasks.add(new Task(desc));
@@ -69,16 +89,15 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }).setNegativeButton("Cancel", null).show();
         });
-        adapter.setOnItemLongClickListener(position -> {
-            tasks.remove(position);
-            adapter.notifyItemRemoved(position);
+        adapter.setOnItemLongClickListener(pos -> {
+            tasks.remove(pos);
+            adapter.notifyItemRemoved(pos);
             Snackbar.make(findViewById(R.id.coordinator_layout), "Task deleted",
                     Snackbar.LENGTH_SHORT).show();
             saveTasksToPreferences();
         });
         drawer = findViewById(R.id.drawer_layout);
         NavigationView navView = findViewById(R.id.nav_view);
-
         toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
                 R.string.navigation_drawer_open,
                 R.string.navigation_drawer_close
@@ -87,21 +106,32 @@ public class MainActivity extends AppCompatActivity {
         toggle.syncState();
         toggle.getDrawerArrowDrawable()
                 .setColor(ContextCompat.getColor(this, android.R.color.white));
-
         navView.setNavigationItemSelectedListener(item -> {
             drawer.closeDrawer(GravityCompat.START);
-            int id = item.getItemId();
-            if (id == R.id.nav_settings) {
+            if (item.getItemId() == R.id.nav_settings) {
                 startActivity(new Intent(this, SettingsActivity.class));
-            } else if (id == R.id.nav_about) {
-                new AlertDialog.Builder(this)
-                        .setTitle("About")
+            } else if (item.getItemId() == R.id.nav_about) {
+                new AlertDialog.Builder(this).setTitle("About")
                         .setMessage("Simple To-Do App\nVersion 1.0")
-                        .setPositiveButton("OK", null)
-                        .show();
+                        .setPositiveButton("OK", null).show();
             }
             return true;
         });
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        ArrayList<String> descs = new ArrayList<>();
+        for (Task t : tasks) {
+            descs.add(t.getDescription());
+        }
+        outState.putStringArrayList(KEY_SAVED_TASKS, descs);
+        boolean[] dones = new boolean[tasks.size()];
+        for (int i = 0; i < tasks.size(); i++) {
+            dones[i] = tasks.get(i).isDone();
+        }
+        outState.putBooleanArray(KEY_SAVED_DONE, dones);
     }
 
     @Override
@@ -124,11 +154,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadTasksFromPreferences() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        Set<String> taskDescriptions = prefs.getStringSet("tasks", new HashSet<>());
+        Set<String> stored = prefs.getStringSet("tasks", new HashSet<>());
         tasks.clear();
-        for (String desc : taskDescriptions) {
+        for (String desc : stored) {
             tasks.add(new Task(desc));
         }
-        adapter.notifyDataSetChanged();
     }
 }
