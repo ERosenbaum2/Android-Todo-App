@@ -33,17 +33,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean nightMode = prefs.getBoolean("night_mode", false);
-        AppCompatDelegate.setDefaultNightMode(
-                nightMode
-                        ? AppCompatDelegate.MODE_NIGHT_YES
-                        : AppCompatDelegate.MODE_NIGHT_NO
-        );
+        AppCompatDelegate.setDefaultNightMode(nightMode ? AppCompatDelegate.MODE_NIGHT_YES
+                        : AppCompatDelegate.MODE_NIGHT_NO);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Drawable whiteOverflow = ContextCompat.getDrawable(this, R.drawable.ic_more_vert_white_24dp);
+        Drawable whiteOverflow = ContextCompat.getDrawable(this,
+                R.drawable.ic_more_vert_white_24dp);
         if (whiteOverflow != null) {
             toolbar.setOverflowIcon(whiteOverflow);
         }
@@ -58,52 +56,37 @@ public class MainActivity extends AppCompatActivity {
         }
         findViewById(R.id.fab).setOnClickListener(v -> {
             EditText input = new EditText(this);
-            new AlertDialog.Builder(this)
-                    .setTitle("Add Task")
-                    .setMessage("Enter task description:")
-                    .setView(input)
+            new AlertDialog.Builder(this).setTitle("Add Task")
+                    .setMessage("Enter task description:").setView(input)
                     .setPositiveButton("Add", (dialog, which) -> {
                         String desc = input.getText().toString().trim();
                         if (!desc.isEmpty()) {
                             tasks.add(new Task(desc));
                             adapter.notifyItemInserted(tasks.size() - 1);
-                            Snackbar.make(
-                                    findViewById(R.id.coordinator_layout),
-                                    "Task added",
-                                    Snackbar.LENGTH_SHORT
-                            ).show();
+                            Snackbar.make(findViewById(R.id.coordinator_layout), "Task added",
+                                    Snackbar.LENGTH_SHORT).show();
                             saveTasksToPreferences();
                         }
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
+                    }).setNegativeButton("Cancel", null).show();
         });
         adapter.setOnItemLongClickListener(position -> {
             tasks.remove(position);
             adapter.notifyItemRemoved(position);
-            Snackbar.make(
-                    findViewById(R.id.coordinator_layout),
-                    "Task deleted",
-                    Snackbar.LENGTH_SHORT
-            ).show();
+            Snackbar.make(findViewById(R.id.coordinator_layout), "Task deleted",
+                    Snackbar.LENGTH_SHORT).show();
             saveTasksToPreferences();
         });
         drawer = findViewById(R.id.drawer_layout);
         NavigationView navView = findViewById(R.id.nav_view);
 
-        toggle = new ActionBarDrawerToggle(
-                this,
-                drawer,
-                toolbar,
+        toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
                 R.string.navigation_drawer_open,
                 R.string.navigation_drawer_close
         );
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         toggle.getDrawerArrowDrawable()
-                .setColor(
-                        ContextCompat.getColor(this, android.R.color.white)
-                );
+                .setColor(ContextCompat.getColor(this, android.R.color.white));
 
         navView.setNavigationItemSelectedListener(item -> {
             drawer.closeDrawer(GravityCompat.START);
@@ -136,9 +119,7 @@ public class MainActivity extends AppCompatActivity {
         for (Task task : tasks) {
             taskDescriptions.add(task.getDescription());
         }
-        prefs.edit()
-                .putStringSet("tasks", taskDescriptions)
-                .apply();
+        prefs.edit().putStringSet("tasks", taskDescriptions).apply();
     }
 
     private void loadTasksFromPreferences() {

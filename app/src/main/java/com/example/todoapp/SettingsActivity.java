@@ -13,9 +13,8 @@ public class SettingsActivity extends AppCompatActivity {
         boolean nightMode = androidx.preference.PreferenceManager
                 .getDefaultSharedPreferences(this)
                 .getBoolean("night_mode", false);
-        AppCompatDelegate.setDefaultNightMode(
-                nightMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
-        );
+        AppCompatDelegate.setDefaultNightMode(nightMode ? AppCompatDelegate.MODE_NIGHT_YES
+                : AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.settings_toolbar);
@@ -25,10 +24,8 @@ public class SettingsActivity extends AppCompatActivity {
             ab.setDisplayHomeAsUpEnabled(true);
         }
         if (savedInstanceState == null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.settings_container, new SettingsFragment())
-                    .commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.settings_container,
+                            new SettingsFragment()).commit();
         }
     }
     @Override

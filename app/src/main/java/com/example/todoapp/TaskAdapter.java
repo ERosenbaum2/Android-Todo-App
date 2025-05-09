@@ -52,18 +52,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
         Task task = tasks.get(pos);
         holder.checkbox.setText(task.getDescription());
         holder.checkbox.setChecked(task.isDone());
-        holder.checkbox.setPaintFlags(
-                task.isDone()
+        holder.checkbox.setPaintFlags(task.isDone()
                         ? holder.checkbox.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
-                        : holder.checkbox.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG
-        );
+                        : holder.checkbox.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
         holder.checkbox.setOnCheckedChangeListener((cb, isChecked) -> {
             task.setDone(isChecked);
-            cb.setPaintFlags(
-                    isChecked
-                            ? cb.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
-                            : cb.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG
-            );
+            cb.setPaintFlags(isChecked ? cb.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
+                            : cb.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
         });
     }
 
