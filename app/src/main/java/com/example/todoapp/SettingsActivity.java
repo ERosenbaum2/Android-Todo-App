@@ -1,6 +1,7 @@
 package com.example.todoapp;
 
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,14 +26,16 @@ public class SettingsActivity extends AppCompatActivity {
         }
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.settings_container,
-                            new SettingsFragment()).commit();
+                    new SettingsFragment()).commit();
         }
     }
+
     @Override
     public boolean onSupportNavigateUp() {
         getOnBackPressedDispatcher().onBackPressed();
         return true;
     }
+
     public static class SettingsFragment extends PreferenceFragmentCompat {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {

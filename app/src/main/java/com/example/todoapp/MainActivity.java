@@ -89,13 +89,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }).setNegativeButton("Cancel", null).show();
         });
-        adapter.setOnItemLongClickListener(pos -> {
-            tasks.remove(pos);
-            adapter.notifyItemRemoved(pos);
-            Snackbar.make(findViewById(R.id.coordinator_layout), "Task deleted",
-                    Snackbar.LENGTH_SHORT).show();
-            saveTasksToPreferences();
-        });
         drawer = findViewById(R.id.drawer_layout);
         NavigationView navView = findViewById(R.id.nav_view);
         toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
@@ -111,8 +104,7 @@ public class MainActivity extends AppCompatActivity {
             if (item.getItemId() == R.id.nav_settings) {
                 startActivity(new Intent(this, SettingsActivity.class));
             } else if (item.getItemId() == R.id.nav_about) {
-                Utils.showInfoDialog(this, "About", "Simple To-Do App\nVersion 1.0"
-                );
+                Utils.showInfoDialog(this, "About", "To Do App");
             }
             return true;
         });
@@ -158,5 +150,14 @@ public class MainActivity extends AppCompatActivity {
         for (String desc : stored) {
             tasks.add(new Task(desc));
         }
+    }
+
+    public void onTaskDeleted() {
+        Snackbar.make(
+                findViewById(R.id.coordinator_layout),
+                "Task deleted",
+                Snackbar.LENGTH_SHORT
+        ).show();
+        saveTasksToPreferences();
     }
 }
